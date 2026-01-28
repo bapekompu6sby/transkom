@@ -1,0 +1,199 @@
+@import "datatables.net-dt/css/dataTables.dataTables.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   DataTables v2 (dt-*) + fallback v1 (.dataTables_wrapper)
+   Custom modern look — CSS only
+   ========================================================= */
+
+/* --- Top controls (length + search) --- */
+.dt-container .dt-length label,
+.dt-container .dt-search label,
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_filter label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .5rem !important;
+  font-size: .875rem !important;
+  color: #374151 !important;
+  margin: 0 0 12px 0 !important;
+}
+
+/* length select */
+.dt-container .dt-length select,
+.dataTables_wrapper .dataTables_length select {
+  height: 2.25rem !important;
+  min-width: 4.25rem !important;
+  padding: 0 .75rem !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: .5rem !important;
+  background: #fff !important;
+  font-size: .875rem !important;
+}
+
+/* search input */
+.dt-container .dt-search input,
+.dataTables_wrapper .dataTables_filter input {
+  height: 2.25rem !important;
+  width: 16rem !important;
+  padding: 0 .75rem !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: .5rem !important;
+  background: #fff !important;
+  font-size: .875rem !important;
+  outline: none !important;
+}
+
+.dt-container .dt-search input:focus,
+.dataTables_wrapper .dataTables_filter input:focus {
+  border-color: #111827 !important;
+  box-shadow: 0 0 0 2px rgba(17, 24, 39, .15) !important;
+}
+
+/* --- Table shell --- */
+table.dataTable,
+table.dt-table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: .75rem !important;
+  overflow: hidden !important;
+}
+
+/* head */
+table.dataTable thead th,
+table.dt-table thead th {
+  background: #f9fafb !important;
+  color: #374151 !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  padding: .85rem 1rem !important;
+}
+
+/* body */
+table.dataTable tbody td,
+table.dt-table tbody td {
+  padding: .9rem 1rem !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  vertical-align: middle !important;
+}
+
+table.dataTable tbody tr:hover,
+table.dt-table tbody tr:hover {
+  background: #f9fafb !important;
+}
+
+/* --- Bottom info + pagination --- */
+.dt-container .dt-info,
+.dataTables_wrapper .dataTables_info {
+  margin-top: 12px !important;
+  font-size: .875rem !important;
+  color: #4b5563 !important;
+}
+
+.dt-container .dt-paging,
+.dataTables_wrapper .dataTables_paginate {
+  margin-top: 10px !important;
+}
+
+/* v2 buttons */
+.dt-container .dt-paging .dt-paging-button,
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: .4rem .65rem !important;
+  margin: 0 .15rem !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: .5rem !important;
+  background: #fff !important;
+  color: #374151 !important;
+  font-size: .875rem !important;
+}
+
+.dt-container .dt-paging .dt-paging-button:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+}
+
+.dt-container .dt-paging .dt-paging-button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #ffffff !important;
+  color: #fff !important;
+  border-color: #111827 !important;
+}
+
+.dt-container .dt-paging .dt-paging-button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  opacity: .5 !important;
+  cursor: not-allowed !important;
+}
+
+/* ====== FORCE override DataTables default (more specific) ====== */
+
+/* wrapper spacing */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+  margin-bottom: 14px !important;
+}
+
+/* search align right (kadang default float) */
+.dataTables_wrapper .dataTables_filter {
+  float: right !important;
+  text-align: right !important;
+}
+.dataTables_wrapper .dataTables_length {
+  float: left !important;
+}
+
+/* input/select look */
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* table border + radius benar-benar kepake */
+.dataTables_wrapper table.dataTable {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* pagination buttons (anchor / button) */
+.dataTables_wrapper .dataTables_paginate a.paginate_button,
+.dataTables_wrapper .dataTables_paginate span a.paginate_button,
+.dataTables_wrapper .dataTables_paginate button.paginate_button {
+  padding: .4rem .65rem !important;
+  margin: 0 .15rem !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: .5rem !important;
+  background: #fff !important;
+  color: #374151 !important;
+  font-size: .875rem !important;
+}
+
+.dataTables_wrapper .dataTables_paginate a.paginate_button:hover,
+.dataTables_wrapper .dataTables_paginate button.paginate_button:hover {
+  background: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+}
+
+.dataTables_wrapper .dataTables_paginate a.paginate_button.current,
+.dataTables_wrapper .dataTables_paginate button.paginate_button.current {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #fff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate a.paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate button.paginate_button.disabled {
+  opacity: .5 !important;
+  cursor: not-allowed !important;
+}
