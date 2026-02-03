@@ -18,34 +18,6 @@
 
     {{-- Right Section --}}
     <div class="flex items-center space-x-6">
-        <!-- Bell Notification -->
-        <button id="bell-btn" onclick="window.location.href='{{ route('admin.trips.index') }}'"
-            class="relative inline-flex items-center justify-center
-           w-10 h-10 rounded-full hover:bg-gray-100 transition
-           focus:outline-none"
-            title="Notifikasi Trip">
-
-            <!-- Icon Wrapper (INI KUNCI UTAMA) -->
-            <span class="relative inline-flex">
-                <!-- Icon Bell -->
-                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11
-                     a6 6 0 10-12 0v3.159
-                     c0 .538-.214 1.055-.595 1.436L4 17h5
-                     m6 0a3 3 0 11-6 0m6 0H9" />
-                </svg>
-
-                <!-- Dot Oren (MENEMPEL KE ICON) -->
-                <span id="notif-badge"
-                    class="hidden absolute -top-1 -right-1
-                     w-2.5 h-2.5 rounded-full
-                     bg-orange-500 ring-2 ring-white">
-                </span>
-            </span>
-        </button>
-
-
         {{-- User Profile Dropdown --}}
         <div class="relative" x-data="{ open: false }" @click.outside="open = false"
             @keydown.escape.window="open = false">

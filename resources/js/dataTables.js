@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ordering: true,
         pageLength: 10,
         columnDefs: [
-            { orderable: false, targets: 3 }, // kolom ke-4 = AKSI
+            { orderable: false, targets: 4 }, // kolom ke-4 = AKSI
         ],
         language: {
             search: "Cari:",
@@ -30,7 +30,43 @@ document.addEventListener("DOMContentLoaded", () => {
         searching: true,
         ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: [3, 4] }],
+        columnDefs: [{ orderable: false, targets: [4, 5] }],
+        language: {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ data",
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            paginate: { previous: "‹", next: "›" },
+        },
+    });
+});
+document.addEventListener("DOMContentLoaded", () => {
+    const table = document.querySelector("#driversTable");
+    if (!table) return;
+
+    new DataTable(table, {
+        paging: true,
+        searching: true,
+        ordering: true,
+        pageLength: 10,
+        columnDefs: [{ orderable: false, targets: [4, 5] }],
+        language: {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ data",
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            paginate: { previous: "‹", next: "›" },
+        },
+    });
+});
+document.addEventListener("DOMContentLoaded", () => {
+    const table = document.querySelector("#tripsTable");
+    if (!table) return;
+
+    new DataTable(table, {
+        paging: true,
+        searching: true,
+        ordering: true,
+        pageLength: 10,
+        columnDefs: [{ orderable: false, targets: [  5, 6, 7] }],
         language: {
             search: "Cari:",
             lengthMenu: "Tampilkan _MENU_ data",

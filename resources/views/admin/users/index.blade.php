@@ -17,14 +17,13 @@
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-200">
                             <th class="px-6 py-3 text-left">
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama</span>
-                                </div>
+                                <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider">No</span>
                             </th>
                             <th class="px-6 py-3 text-left">
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</span>
-                                </div>
+                                <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama</span>
+                            </th>
+                            <th class="px-6 py-3 text-left">
+                                <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</span>
                             </th>
                             <th class="px-6 py-3 text-left">
                                 <span
@@ -38,6 +37,10 @@
                     <tbody class="divide-y divide-gray-200">
                         @forelse($users ?? [] as $user)
                             <tr class="hover:bg-gray-50 transition">
+                                {{-- No --}}
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                    {{ $loop->iteration }}
+                                </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center space-x-3">
                                         <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
@@ -55,10 +58,6 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center space-x-3">
-                                        {{-- details --}}
-                                        <button class="text-gray-400 hover:text-gray-600 transition">
-                                            <i class="fas fa-times text-lg"></i>
-                                        </button>
                                         {{-- edit --}}
                                         <button class="text-gray-400 hover:text-gray-600 transition">
                                             <i class="fas fa-edit text-lg"></i>

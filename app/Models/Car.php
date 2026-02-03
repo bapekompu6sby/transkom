@@ -10,6 +10,7 @@ class Car extends Model
 
     protected $fillable = [
         'name',
+        'image_url',
         'year',
         'color',
         'plate_number',
@@ -17,4 +18,19 @@ class Car extends Model
         'status',
         'description',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function trips()
+    {
+        return $this->hasMany(Trip::class);
+    }
+
+    public function drivers()
+    {
+        return $this->hasMany(Driver::class);
+    }
 }

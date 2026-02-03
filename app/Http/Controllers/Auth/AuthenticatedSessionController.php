@@ -14,9 +14,27 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create()
     {
-        return view('auth.login');
+
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+
+            if ($user->role === 'user') {
+                return redirect()->route('user.dashboard');
+            }
+
+            // fallback (role tidak dikenal)
+            Auth::logout();
+            return redirect()->route('auth.login-user');
+        }
+
+        // 👇 Jika belum login, tampilkan halaman login
+        return view('auth.login-user');
     }
 
     /**
@@ -34,7 +52,7 @@ class AuthenticatedSessionController extends Controller
 
         if ($user->role !== $loginAs) {
             Auth::logout();
-            return back()->withErrors([
+            return redirect()->route('/')->withErrors([
                 'email' => 'Anda tidak punya akses login di sini.',
             ]);
         }
@@ -45,7 +63,7 @@ class AuthenticatedSessionController extends Controller
         }
 
 
-        return redirect('/dashboard');
+        return redirect()->route('user.dashboard');
     }
 
     /**
