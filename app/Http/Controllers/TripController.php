@@ -119,7 +119,7 @@ class TripController extends Controller
                 'destination'     => ['required', 'string', 'max:255'],
 
                 'driver_required' => ['required', 'boolean'],
-                'driver_id'       => ['nullable', 'integer', 'exists:drivers,id', 'required_if:driver_required,1'],
+                'driver_id'       => ['nullable', 'integer', 'exists:driver,id', 'required_if:driver_required,1'],
 
                 'status'          => ['required', Rule::in(['pending', 'approved', 'cancelled'])],
 
