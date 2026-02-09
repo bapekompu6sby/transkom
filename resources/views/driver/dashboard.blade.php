@@ -111,24 +111,25 @@
                                     </div>
                                 </div>
 
-                                {{-- Time range (FIX UI Mobile) --}}
+                                {{-- Time range (Mobile stack, Desktop 2 kolom) --}}
                                 <div class="rounded-lg border p-3">
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <div class="text-xs text-gray-500">Mulai</div>
-                                            <div class="mt-1 text-sm font-semibold text-gray-900">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div class="flex items-center justify-between sm:block">
+                                            <span class="text-xs text-gray-500">Mulai</span>
+                                            <span class="text-sm font-semibold text-gray-900">
                                                 {{ \Carbon\Carbon::parse($trip->start_at)->format('d M, H:i') }}
-                                            </div>
+                                            </span>
                                         </div>
 
-                                        <div class="text-right">
-                                            <div class="text-xs text-gray-500">Selesai</div>
-                                            <div class="mt-1 text-sm font-semibold text-gray-900">
+                                        <div class="flex items-center justify-between sm:block sm:text-right">
+                                            <span class="text-xs text-gray-500">Selesai</span>
+                                            <span class="text-sm font-semibold text-gray-900">
                                                 {{ \Carbon\Carbon::parse($trip->end_at)->format('d M, H:i') }}
-                                            </div>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
+
 
 
                                 {{-- Notes --}}
