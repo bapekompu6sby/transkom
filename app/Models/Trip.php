@@ -22,6 +22,12 @@ class Trip extends Model
         'end_at',
     ];
 
+    protected $casts = [
+        'start_at' => 'datetime',
+        'end_at'   => 'datetime',
+    ];
+
+
     public function car()
     {
         return $this->belongsTo(Car::class);

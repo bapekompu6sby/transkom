@@ -21,11 +21,11 @@ class AuthenticatedSessionController extends Controller
             $user = Auth::user();
 
             if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
+                return redirect()->route('admin.dashboard')->with('success', 'Selamat datang kembali, ' . $user->name . '!');;
             }
 
             if ($user->role === 'user') {
-                return redirect()->route('user.dashboard');
+                return redirect()->route('user.dashboard')->with('success', 'Selamat datang kembali, ' . $user->name . '!');;
             }
 
             // fallback (role tidak dikenal)
@@ -46,25 +46,23 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
-
-        // Ambil role dari form login
         $loginAs = $request->login_as;
 
         if ($user->role !== $loginAs) {
             Auth::logout();
-            return redirect()->route('/')->withErrors([
-                'email' => 'Anda tidak punya akses login di sini.',
+
+            return redirect()->route('login')->withErrors([
+                'login' => 'Anda tidak punya akses login di sini.',
             ]);
         }
 
-        // Redirect sesuai role
         if ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admin.dashboard')->with('success', 'Selamat datang kembali, ' . $user->name . '!');
         }
 
-
-        return redirect()->route('user.dashboard');
+        return redirect()->route('user.dashboard')->with('success', 'Selamat datang kembali, ' . $user->name . '!');;
     }
+
 
     /**
      * Destroy an authenticated session.

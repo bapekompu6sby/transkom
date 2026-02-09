@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LayoutsUserController;
 use App\Http\Controllers\DashboardAdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DriverUIController;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('/');
 
@@ -24,6 +25,12 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/history', [HistoryController::class, 'index'])->name('user.history.index');
+});
+
+Route::get('/login-driver', [DriverUIController::class, 'showLoginForm'])->name('login.driver');
+Route::post('/login-driver', [DriverUIController::class, 'login'])->name('login.driver.submit');
+Route::middleware('auth:driver')->prefix('driver')->group(function () {
+    Route::get('/dashboard', [DriverUIController::class, 'dashboard'])->name('driver.dashboard');
 });
 
 

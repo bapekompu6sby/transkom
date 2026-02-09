@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 
-class Driver extends Model
+class Driver extends Authenticatable
 {
     protected $table = 'drivers';
     protected $fillable = [
         'name',
         'phone_number',
         'email',
+        'password',
         'status',
         'notes',
     ];

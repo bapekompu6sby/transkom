@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TRANSKOM — Login Peminjam</title>
+    <title>TRANSKOM — Login Driver</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -205,18 +205,18 @@
 
                         <div class="role-badge">
                             <span class="role-dot"></span>
-                            <span>Login sebagai <strong>Peminjam</strong></span>
+                            <span>Login sebagai <strong>Driver</strong></span>
                         </div>
 
-                        <h1>Peminjaman Kendaraan</h1>
-                        <p>Masuk untuk mengajukan dan memantau peminjaman kendaraan.</p>
+                        <h1>Penugasan Driver</h1>
+                        <p>Masuk untuk melihat jadwal dan detail penugasan perjalanan.</p>
                     </div>
                 </div>
 
                 <div class="col-12 col-md-7">
                     <div class="auth-right">
                         <div class="mb-3">
-                            <div class="fw-semibold" style="font-size:16px;">Masuk Peminjam</div>
+                            <div class="fw-semibold" style="font-size:16px;">Masuk Driver</div>
                             <div class="helper">Gunakan Email atau Nama + kata sandi.</div>
                         </div>
 
@@ -231,15 +231,15 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('login') }}" class="mt-3">
+                        <form method="POST" action="{{ route('login.driver') }}" class="mt-3">
                             @csrf
-                            <input type="hidden" name="login_as" value="user">
+                            {{-- <input type="hidden" name="login_as" value="driver"> --}}
 
                             <div class="mb-3">
                                 <label class="form-label">Email / Nama</label>
                                 <input type="text" name="login" value="{{ old('login') }}"
                                     class="form-control @error('login') is-invalid @enderror"
-                                    placeholder="contoh: nama@email.com atau aril" required autofocus>
+                                    placeholder="contoh: driver@bapekom.go.id atau aril" required autofocus>
                                 @error('login')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -251,7 +251,7 @@
                                 <div class="input-group">
                                     <input type="password" name="password" id="password"
                                         class="form-control @error('password') is-invalid @enderror"
-                                        placeholder="********" required>
+                                        placeholder="driverbapekom6sby" required>
 
                                     <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                         👁
@@ -262,6 +262,7 @@
                                     @enderror
                                 </div>
                             </div>
+
 
                             {{-- <div
                                 class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
@@ -274,8 +275,8 @@
 
                             <button type="submit" class="btn btn-primary w-100">Masuk</button>
 
-                            <p class="text-center small mt-3 mb-0">
-                                Belum punya akun? <a class="subtle-link" href="{{ route('register') }}">Daftar</a>
+                            <p class="text-center small mb-0 mt-3 helper">
+                                Akun driver dibuat oleh admin.
                             </p>
                         </form>
                     </div>
@@ -298,6 +299,7 @@
             this.textContent = type === 'password' ? '👁' : '◉_◉';
         });
     </script>
+
 </body>
 
 </html>

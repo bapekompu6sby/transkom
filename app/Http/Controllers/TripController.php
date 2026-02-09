@@ -55,7 +55,7 @@ class TripController extends Controller
             // ambil list jadwal yang overlap (bukan cuma exists)
             $overlaps = Trip::query()
                 ->where('car_id', $validated['car_id'])
-                ->whereIn('status', ['pending', 'approved', 'ongoing'])
+                ->whereIn('status', ['approved'])
                 ->where(function ($q) use ($startAt, $endAt) {
                     $q->where('start_at', '<', $endAt)
                         ->where('end_at', '>', $startAt);
@@ -147,24 +147,33 @@ class TripController extends Controller
 
             DB::beginTransaction();
 
-            // 4) Cek overlap jadwal kendaraan (exclude trip ini sendiri)
-            $hasOverlap = Trip::query()
-                ->where('car_id', $validated['car_id'])
-                ->where('id', '!=', $trip->id)
-                ->whereIn('status', ['pending', 'approved']) // yang dianggap mengunci
-                ->where(function ($q) use ($startAt, $endAt) {
-                    $q->where('start_at', '<', $endAt)
-                        ->where('end_at', '>', $startAt);
-                })
-                ->exists();
+            $isLockingStatus = in_array($validated['status'], ['approved'], true);
 
-            if ($hasOverlap) {
-                DB::rollBack();
-                return back()
-                    ->withInput()
-                    ->with('error', 'Jadwal bentrok: kendaraan sudah terpakai pada rentang waktu tersebut.');
+            if ($isLockingStatus) {
+                $overlapTrip = Trip::query()
+                    ->where('car_id', $validated['car_id'])
+                    ->where('id', '!=', $trip->id)
+                    ->whereIn('status', ['approved']) // atau ['pending','approved'] kalau pending juga ngunci
+                    ->where(function ($q) use ($startAt, $endAt) {
+                        $q->where('start_at', '<', $endAt)
+                            ->where('end_at', '>', $startAt);
+                    })
+                    ->first();
+
+                if ($overlapTrip) {
+                    DB::rollBack();
+
+                    return back()
+                        ->withInput()
+                        ->with(
+                            'failed',
+                            'Jadwal bentrok pada waktu ' .
+                                $overlapTrip->start_at->format('d M Y H:i') .
+                                ' - ' .
+                                $overlapTrip->end_at->format('d M Y H:i')
+                        );
+                }
             }
-
             // 5) Update data
             $trip->update([
                 'car_id'         => (int) $validated['car_id'],
@@ -191,14 +200,14 @@ class TripController extends Controller
             return back()
                 ->withInput()
                 ->withErrors($e->validator)
-                ->with('error', 'Input tidak valid. Cek field yang wajib diisi.');
+                ->with('failed', 'Input tidak valid. Cek field yang wajib diisi.');
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
 
             return back()
                 ->withInput()
-                ->with('error', 'Terjadi kesalahan saat update peminjaman. Coba lagi.');
+                ->with('failed', 'Terjadi kesalahan saat update peminjaman. Coba lagi.');
         }
     }
 
@@ -215,7 +224,7 @@ class TripController extends Controller
 
             return redirect()
                 ->route('admin.trips.index')
-                ->with('error', 'Gagal menghapus data peminjaman. Coba lagi.');
+                ->with('failed', 'Gagal menghapus data peminjaman. Coba lagi.');
         }
     }
 
