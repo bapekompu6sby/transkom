@@ -133,14 +133,14 @@ class TripController extends Controller
             $driverRequired = (int) $validated['driver_required'];
 
             // 2) Validasi conditional: kalau butuh sopir, driver_id wajib
-            if ($driverRequired === 1 && empty($validated['drivers_id'])) {
+            if ($driverRequired === 1 && empty($validated['driver_id'])) {
                 throw ValidationException::withMessages([
                     'driver_id' => 'Sopir wajib dipilih jika kebutuhan sopir = Dengan sopir.',
                 ]);
             }
 
             // 3) Normalisasi: kalau tanpa sopir, paksa driver_id null
-            $driverId = $driverRequired === 1 ? (int) $validated['drivers_id'] : null;
+            $driverId = $driverRequired === 1 ? (int) $validated['driver_id'] : null;
 
             $startAt = Carbon::parse($validated['start_at']);
             $endAt   = Carbon::parse($validated['end_at']);
