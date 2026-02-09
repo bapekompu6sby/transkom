@@ -47,18 +47,16 @@ class DriverUIController extends Controller
 
     public function dashboard()
     {
-
         $driver = Auth::guard('driver')->user();
-
-        $now = Carbon::now();
+        $now = now(); // Laravel helper, udah Carbon
 
         $trips = Trip::with(['car', 'user', 'driver'])
             ->where('driver_id', $driver->id)
             ->where('status', 'approved')
-            ->where('start_at', '<=', $now)
-            ->where('end_at', '>=', $now)
+            ->where('end_at', '>=', $now)   // <- penting: belum berakhir
             ->orderBy('start_at')
             ->get();
+
         return view('driver.dashboard', compact('driver', 'trips', 'now'));
     }
 }

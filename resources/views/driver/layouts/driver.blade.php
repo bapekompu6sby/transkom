@@ -52,11 +52,11 @@
 
         {{-- Mobile Sidebar (off-canvas) --}}
         {{-- <div x-show="sidebarOpen" x-cloak class="fixed inset-0 z-50 md:hidden"> --}}
-            {{-- Overlay --}}
-            {{-- <div class="absolute inset-0 bg-black/40" @click="sidebarOpen = false"></div> --}}
+        {{-- Overlay --}}
+        {{-- <div class="absolute inset-0 bg-black/40" @click="sidebarOpen = false"></div> --}}
 
-            {{-- Sidebar Panel --}}
-            {{-- @include('user.layouts.sidebar-mobile')
+        {{-- Sidebar Panel --}}
+        {{-- @include('user.layouts.sidebar-mobile')
         </div> --}}
 
 
@@ -117,6 +117,8 @@
             });
         });
     </script>
+    @stack('scripts')
+
 
 </body>
 
