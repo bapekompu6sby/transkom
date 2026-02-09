@@ -31,7 +31,7 @@ class TripController extends Controller
     {
         $validated = $request->validate([
             'car_id'          => ['required', 'integer', 'exists:cars,id'],
-            'driver_required' => ['required', Rule::in([0, 1, '0', '1'])],
+            'driver_required' => ['required', 'boolean'],
             'destination'     => ['required', 'string', 'max:255'],
             'start_at'        => ['required', 'date_format:Y-m-d\TH:i'],
             'end_at'          => ['required', 'date_format:Y-m-d\TH:i', 'after:start_at'],
@@ -118,8 +118,8 @@ class TripController extends Controller
                 'requester_name'  => ['nullable', 'string', 'max:255'],
                 'destination'     => ['required', 'string', 'max:255'],
 
-                'driver_required' => ['required', Rule::in(['0', '1', 0, 1])],
-                'driver_id'       => ['nullable', 'integer', 'exists:drivers,id'],
+                'driver_required' => ['required', 'boolean'],
+                'driver_id'       => ['nullable', 'integer', 'exists:drivers,id', 'required_if:driver_required,1'],
 
                 'status'          => ['required', Rule::in(['pending', 'approved', 'cancelled'])],
 
@@ -188,7 +188,10 @@ class TripController extends Controller
                 ->route('admin.trips.index')
                 ->with('success', 'Data peminjaman berhasil diperbarui.');
         } catch (ValidationException $e) {
-            throw $e;
+            return back()
+                ->withInput()
+                ->withErrors($e->validator)
+                ->with('error', 'Input tidak valid. Cek field yang wajib diisi.');
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
