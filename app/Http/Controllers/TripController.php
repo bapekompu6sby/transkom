@@ -201,39 +201,46 @@ class TripController extends Controller
 
             DB::afterCommit(function () use ($trip, $oldDriverId, $oldStatus, $driverId, $validated) {
 
-                // Kondisi: driver baru ditentukan / berubah
-                $driverJustAssigned = !empty($driverId) && ((int) $oldDriverId !== (int) $driverId);
+                // Wajib ada driver, kalau tidak ada ya stop
+                if (empty($driverId)) {
+                    return;
+                }
 
-                // Kondisi opsional: status jadi approved (kalau kamu mau notif di momen approve)
+                $driverJustAssigned = ((int) $oldDriverId !== (int) $driverId);
                 $statusJustApproved = ($validated['status'] === 'approved' && $oldStatus !== 'approved');
 
                 if (!($driverJustAssigned || $statusJustApproved)) {
                     return;
                 }
 
-                $beams = new PushNotifications([
-                    'instanceId' => config('services.beams.instance_id'),
-                    'secretKey'  => config('services.beams.secret_key'),
-                ]);
+                try {
+                    $beams = new \Pusher\PushNotifications\PushNotifications([
+                        'instanceId' => config('services.beams.instance_id'),
+                        'secretKey'  => config('services.beams.secret_key'),
+                    ]);
 
-                $userId = 'driver:' . (int) $driverId;
+                    $userId = 'driver:' . (int) $driverId;
 
-                $title = $driverJustAssigned ? 'Penugasan Baru 🚗' : 'Trip Di-approve ✅';
-                $body  = "Trip ke {$trip->destination} (" . $trip->start_at->format('d M Y H:i') . " - " . $trip->end_at->format('d M Y H:i') . ")";
+                    $title = $driverJustAssigned ? 'Penugasan Baru 🚗' : 'Trip Di-approve ✅';
+                    $body  = "Trip ke {$trip->destination} (" .
+                        $trip->start_at->format('d M Y H:i') . " - " .
+                        $trip->end_at->format('d M Y H:i') . ")";
 
-                $beams->publishToUsers(
-                    [$userId],
-                    [
+                    $beams->publishToUsers([$userId], [
                         'web' => [
                             'notification' => [
                                 'title' => $title,
-                                'body'  => $body,
+                                'body' => $body,
                                 'deep_link' => url('/driver/dashboard'),
                             ],
                         ],
-                    ]
-                );
+                    ]);
+                } catch (\Throwable $e) {
+                    // jangan bikin request gagal, cukup log
+                    report($e);
+                }
             });
+
 
 
             DB::commit();
