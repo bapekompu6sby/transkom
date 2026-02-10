@@ -47,22 +47,6 @@
         x-effect="document.body.classList.toggle('overflow-hidden', sidebarOpen)" class="relative flex h-screen">
 
 
-        {{-- Sidebar Desktop (tampil md ke atas) --}}
-        {{-- <div class="hidden md:flex">
-            @include('user.layouts.sidebar')
-        </div> --}}
-
-
-        {{-- Mobile Sidebar (off-canvas) --}}
-        {{-- <div x-show="sidebarOpen" x-cloak class="fixed inset-0 z-50 md:hidden"> --}}
-        {{-- Overlay --}}
-        {{-- <div class="absolute inset-0 bg-black/40" @click="sidebarOpen = false"></div> --}}
-
-        {{-- Sidebar Panel --}}
-        {{-- @include('user.layouts.sidebar-mobile')
-        </div> --}}
-
-
         {{-- Main Content --}}
         <div class="flex-1 flex flex-col overflow-hidden">
             {{-- Navbar --}}

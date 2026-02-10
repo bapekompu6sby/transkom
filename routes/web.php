@@ -35,6 +35,29 @@ Route::middleware('auth:driver')->prefix('driver')->group(function () {
     Route::get('/beams-auth', [DriverBeamsController::class, 'auth']);
 });
 
+Route::get('/admin/test-driver-notif/{driver}', function (\App\Models\Driver $driver) {
+    $beams = new \Pusher\PushNotifications\PushNotifications([
+        'instanceId' => config('services.beams.instance_id'),
+        'secretKey'  => config('services.beams.secret_key'),
+    ]);
+
+    $beams->publishToUsers(
+        ['driver:' . $driver->id],
+        [
+            'web' => [
+                'notification' => [
+                    'title' => 'Test Notif',
+                    'body'  => 'Kalau ini muncul, berarti setUserId + SW sudah OK.',
+                    'deep_link' => url('/driver/dashboard'),
+                ],
+            ],
+        ]
+    );
+
+    return 'sent';
+})->middleware('auth');
+
+
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
