@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Driver;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\RedirectResponse;
 
 class DriverController extends Controller
 {
@@ -29,10 +30,12 @@ class DriverController extends Controller
             'notes'        => ['nullable', 'string'],
         ]);
 
-        // Normalisasi ringan (opsional tapi membantu)
         $data['phone_number'] = isset($data['phone_number'])
             ? preg_replace('/\s+/', '', $data['phone_number'])
             : null;
+
+        // Tambahkan password default
+        $data['password'] = Hash::make('driverbapekom6sby');
 
         Driver::create($data);
 
@@ -40,6 +43,7 @@ class DriverController extends Controller
             ->route('admin.drivers.index')
             ->with('success', 'Driver berhasil ditambahkan.');
     }
+
 
     public function update(Request $request, Driver $driver): RedirectResponse
     {
@@ -54,6 +58,8 @@ class DriverController extends Controller
         $data['phone_number'] = isset($data['phone_number'])
             ? preg_replace('/\s+/', '', $data['phone_number'])
             : null;
+
+        $data['password'] = Hash::make('driverbapekom6sby');
 
         $driver->update($data);
 
