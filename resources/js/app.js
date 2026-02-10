@@ -4,6 +4,9 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { initDriverBeams } from "./beams-driver";
 
 import Alpine from "alpinejs";
+
+console.log("Instance ID:", import.meta.env.VITE_BEAMS_INSTANCE_ID);
+
 window.Alpine = Alpine;
 Alpine.start();
 
