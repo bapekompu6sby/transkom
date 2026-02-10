@@ -35,6 +35,9 @@
         }
     </style>
     @stack('css')
+    <script>
+        window.__DRIVER_ID__ = {{ auth('driver')->id() }};
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>

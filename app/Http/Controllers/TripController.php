@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Pusher\PushNotifications\PushNotifications;
+
 
 class TripController extends Controller
 {
@@ -145,6 +147,10 @@ class TripController extends Controller
             $startAt = Carbon::parse($validated['start_at']);
             $endAt   = Carbon::parse($validated['end_at']);
 
+            $oldDriverId = $trip->driver_id;
+            $oldStatus   = $trip->status;
+
+
             DB::beginTransaction();
 
             $isLockingStatus = in_array($validated['status'], ['approved'], true);
@@ -189,7 +195,46 @@ class TripController extends Controller
 
                 'start_at'       => $startAt,
                 'end_at'         => $endAt,
+
+
             ]);
+
+            DB::afterCommit(function () use ($trip, $oldDriverId, $oldStatus, $driverId, $validated) {
+
+                // Kondisi: driver baru ditentukan / berubah
+                $driverJustAssigned = !empty($driverId) && ((int) $oldDriverId !== (int) $driverId);
+
+                // Kondisi opsional: status jadi approved (kalau kamu mau notif di momen approve)
+                $statusJustApproved = ($validated['status'] === 'approved' && $oldStatus !== 'approved');
+
+                if (!($driverJustAssigned || $statusJustApproved)) {
+                    return;
+                }
+
+                $beams = new PushNotifications([
+                    'instanceId' => config('services.beams.instance_id'),
+                    'secretKey'  => config('services.beams.secret_key'),
+                ]);
+
+                $userId = 'driver:' . (int) $driverId;
+
+                $title = $driverJustAssigned ? 'Penugasan Baru 🚗' : 'Trip Di-approve ✅';
+                $body  = "Trip ke {$trip->destination} (" . $trip->start_at->format('d M Y H:i') . " - " . $trip->end_at->format('d M Y H:i') . ")";
+
+                $beams->publishToUsers(
+                    [$userId],
+                    [
+                        'web' => [
+                            'notification' => [
+                                'title' => $title,
+                                'body'  => $body,
+                                'deep_link' => url('/driver/dashboard'),
+                            ],
+                        ],
+                    ]
+                );
+            });
+
 
             DB::commit();
 
