@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\ValidationException;
 use Pusher\PushNotifications\PushNotifications;
 
@@ -111,10 +112,9 @@ class TripController extends Controller
     }
 
 
-    public function update(Request $request, Trip $trip)
+    public function update(Request $request, Trip $trip): RedirectResponse
     {
         try {
-            // 1) Validasi dasar
             $validated = $request->validate([
                 'car_id'          => ['required', 'integer', 'exists:cars,id'],
                 'requester_name'  => ['nullable', 'string', 'max:255'],
@@ -134,22 +134,19 @@ class TripController extends Controller
 
             $driverRequired = (int) $validated['driver_required'];
 
-            // 2) Validasi conditional: kalau butuh sopir, driver_id wajib
             if ($driverRequired === 1 && empty($validated['driver_id'])) {
                 throw ValidationException::withMessages([
                     'driver_id' => 'Sopir wajib dipilih jika kebutuhan sopir = Dengan sopir.',
                 ]);
             }
 
-            // 3) Normalisasi: kalau tanpa sopir, paksa driver_id null
             $driverId = $driverRequired === 1 ? (int) $validated['driver_id'] : null;
 
             $startAt = Carbon::parse($validated['start_at']);
             $endAt   = Carbon::parse($validated['end_at']);
 
-            $oldDriverId = $trip->driver_id;
+            $oldDriverId = (int) ($trip->driver_id ?? 0);
             $oldStatus   = $trip->status;
-
 
             DB::beginTransaction();
 
@@ -159,7 +156,7 @@ class TripController extends Controller
                 $overlapTrip = Trip::query()
                     ->where('car_id', $validated['car_id'])
                     ->where('id', '!=', $trip->id)
-                    ->whereIn('status', ['approved']) // atau ['pending','approved'] kalau pending juga ngunci
+                    ->whereIn('status', ['approved'])
                     ->where(function ($q) use ($startAt, $endAt) {
                         $q->where('start_at', '<', $endAt)
                             ->where('end_at', '>', $startAt);
@@ -174,74 +171,86 @@ class TripController extends Controller
                         ->with(
                             'failed',
                             'Jadwal bentrok pada waktu ' .
-                                $overlapTrip->start_at->format('d M Y H:i') .
-                                ' - ' .
+                                $overlapTrip->start_at->format('d M Y H:i') . ' - ' .
                                 $overlapTrip->end_at->format('d M Y H:i')
                         );
                 }
             }
-            // 5) Update data
+
             $trip->update([
-                'car_id'         => (int) $validated['car_id'],
-                'requester_name' => $validated['requester_name'] ?? null,
-                'destination'    => $validated['destination'],
+                'car_id'          => (int) $validated['car_id'],
+                'requester_name'  => $validated['requester_name'] ?? null,
+                'destination'     => $validated['destination'],
 
                 'driver_required' => $driverRequired,
-                'driver_id'      => $driverId,
+                'driver_id'       => $driverId,
 
-                'status'         => $validated['status'],
-                'notes'          => $validated['notes'] ?? null,
-                'notes_cancel'   => $validated['notes_cancel'] ?? null,
+                'status'          => $validated['status'],
+                'notes'           => $validated['notes'] ?? null,
+                'notes_cancel'    => $validated['notes_cancel'] ?? null,
 
-                'start_at'       => $startAt,
-                'end_at'         => $endAt,
-
-
+                'start_at'        => $startAt,
+                'end_at'          => $endAt,
             ]);
 
-            DB::afterCommit(function () use ($trip, $oldDriverId, $oldStatus, $driverId, $validated) {
+            // === Tentukan apakah perlu notif (setelah update, karena pakai wasChanged) ===
+            $driverJustAssigned = !empty($driverId) && ($oldDriverId !== (int) $driverId);
+            $statusJustApproved = ($validated['status'] === 'approved' && $oldStatus !== 'approved');
 
-                // Wajib ada driver, kalau tidak ada ya stop
-                if (empty($driverId)) {
-                    return;
-                }
+            $importantChanged =
+                $trip->wasChanged('destination') ||
+                $trip->wasChanged('start_at') ||
+                $trip->wasChanged('end_at') ||
+                $trip->wasChanged('car_id');
 
-                $driverJustAssigned = ((int) $oldDriverId !== (int) $driverId);
-                $statusJustApproved = ($validated['status'] === 'approved' && $oldStatus !== 'approved');
+            $shouldNotify =
+                !empty($driverId) &&
+                (
+                    $driverJustAssigned ||
+                    $statusJustApproved ||
+                    // kalau status sudah approved, tapi ada revisi penting → kasih notif
+                    ($validated['status'] === 'approved' && $importantChanged)
+                );
 
-                if (!($driverJustAssigned || $statusJustApproved)) {
-                    return;
-                }
+            if ($shouldNotify) {
+                DB::afterCommit(function () use ($trip, $driverId, $driverJustAssigned, $statusJustApproved, $importantChanged) {
+                    try {
+                        $beams = new \Pusher\PushNotifications\PushNotifications([
+                            'instanceId' => config('services.beams.instance_id'),
+                            'secretKey'  => config('services.beams.secret_key'),
+                        ]);
 
-                try {
-                    $beams = new \Pusher\PushNotifications\PushNotifications([
-                        'instanceId' => config('services.beams.instance_id'),
-                        'secretKey'  => config('services.beams.secret_key'),
-                    ]);
+                        $userId = 'driver:' . (int) $driverId;
 
-                    $userId = 'driver:' . (int) $driverId;
+                        if ($driverJustAssigned) {
+                            $title = 'Penugasan Baru 🚗';
+                        } elseif ($statusJustApproved) {
+                            $title = 'Trip Di-approve ✅';
+                        } elseif ($importantChanged) {
+                            $title = 'Perubahan Jadwal/Detail Trip ✏️';
+                        } else {
+                            $title = 'Update Trip';
+                        }
 
-                    $title = $driverJustAssigned ? 'Penugasan Baru 🚗' : 'Trip Di-approve ✅';
-                    $body  = "Trip ke {$trip->destination} (" .
-                        $trip->start_at->format('d M Y H:i') . " - " .
-                        $trip->end_at->format('d M Y H:i') . ")";
+                        $body = "Trip ke {$trip->destination} (" .
+                            $trip->start_at->format('d M Y H:i') . " - " .
+                            $trip->end_at->format('d M Y H:i') . ")";
 
-                    $beams->publishToUsers([$userId], [
-                        'web' => [
-                            'notification' => [
-                                'title' => $title,
-                                'body' => $body,
-                                'deep_link' => url('/driver/dashboard'),
+                        $beams->publishToUsers([$userId], [
+                            'web' => [
+                                'notification' => [
+                                    'title' => $title,
+                                    'body'  => $body,
+                                    'deep_link' => url('/driver/dashboard'),
+                                ],
                             ],
-                        ],
-                    ]);
-                } catch (\Throwable $e) {
-                    // jangan bikin request gagal, cukup log
-                    report($e);
-                }
-            });
-
-
+                        ]);
+                    } catch (\Throwable $e) {
+                        // notif gagal? gapapa. jangan ganggu success response.
+                        report($e);
+                    }
+                });
+            }
 
             DB::commit();
 
@@ -262,6 +271,7 @@ class TripController extends Controller
                 ->with('failed', 'Terjadi kesalahan saat update peminjaman. Coba lagi.');
         }
     }
+
 
     public function destroy(Trip $trip)
     {
