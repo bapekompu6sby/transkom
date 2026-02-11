@@ -36,15 +36,11 @@
     </style>
     @stack('css')
     <script>
-        window.__DRIVER_ID__ = {{ auth('driver')->id() }};
+        window.__DRIVER_ID__ = {{ (int) auth('driver')->id() }};
     </script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script type="module">
-        import {
-            initDriverBeams
-        } from "{{ Vite::asset('resources/js/beams-driver.js') }}";
-        initDriverBeams({{ (int) auth('driver')->id() }});
-    </script>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/beams-driver.js'])
+
 
 
 </head>

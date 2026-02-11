@@ -1,3 +1,11 @@
+import { initDriverBeams } from "./beams-driver-core";
+// atau kalau function-nya memang di file ini, skip import ini
+
+const driverId = Number(window.__DRIVER_ID__ || 0);
+if (driverId > 0) {
+    initDriverBeams(driverId);
+}
+
 import * as PusherPushNotifications from "@pusher/push-notifications-web";
 
 let beamsClientSingleton = null;
