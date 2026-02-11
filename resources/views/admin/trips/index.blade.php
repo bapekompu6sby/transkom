@@ -44,6 +44,10 @@
                             <th class="px-6 py-3 text-left">
                                 <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Aksi</span>
                             </th>
+                            {{-- eksport --}}
+                            <th class="px-6 py-3 text-left">
+                                <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Eksport</span>
+                            </th>
                         </tr>
                     </thead>
 
@@ -138,6 +142,29 @@
                                         </button>
                                     </div>
                                 </td>
+                                {{-- Eksport --}}
+                                <td class="px-6 py-4">
+                                    @php $canExport = $trip->status === 'approved'; @endphp
+
+                                    <div class="flex gap-2">
+                                        <a href="{{ $canExport ? route('admin.trips.export.basic', $trip->id) : '#' }}"
+                                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold
+                   {{ $canExport ? 'bg-gray-900 text-white hover:bg-gray-800' : 'bg-gray-200 text-gray-500 cursor-not-allowed pointer-events-none' }}">
+                                        Biasa
+                                        </a>
+
+                                        <a href="{{ $canExport ? route('admin.trips.export.special', $trip->id) : '#' }}"
+                                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold
+                   {{ $canExport ? 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50' : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed pointer-events-none' }}">
+                                            Khusus
+                                        </a>
+                                    </div>
+
+                                    @if (!$canExport)
+                                        <div class="text-[11px] text-gray-500 mt-1">Export aktif setelah disetujui.</div>
+                                    @endif
+                                </td>
+
                             </tr>
                         @empty
                             <tr>

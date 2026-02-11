@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
         searching: true,
         ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: [  5, 6, 7] }],
+        columnDefs: [{ orderable: false, targets: [  5, 6, 7, 8] }],
         language: {
             search: "Cari:",
             lengthMenu: "Tampilkan _MENU_ data",

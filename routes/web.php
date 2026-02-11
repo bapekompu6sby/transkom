@@ -8,6 +8,7 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DriverUIController;
+use App\Http\Controllers\TripExportController;
 use App\Http\Controllers\DriverBeamsController;
 use App\Http\Controllers\LayoutsUserController;
 use App\Http\Controllers\DashboardAdminController;
@@ -30,34 +31,11 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/login-driver', [DriverUIController::class, 'showLoginForm'])->name('login.driver');
 Route::post('/login-driver', [DriverUIController::class, 'login'])->name('login.driver.submit');
+
 Route::middleware('auth:driver')->prefix('driver')->group(function () {
     Route::get('/dashboard', [DriverUIController::class, 'dashboard'])->name('driver.dashboard');
-    Route::get('/beams-auth', [DriverBeamsController::class, 'auth']);
+    Route::get('/beams-auth', [DriverBeamsController::class, 'auth'])->name('driver.beams.auth');
 });
-
-Route::get('/admin/test-driver-notif/{driver}', function (\App\Models\Driver $driver) {
-    $beams = new \Pusher\PushNotifications\PushNotifications([
-        'instanceId' => config('services.beams.instance_id'),
-        'secretKey'  => config('services.beams.secret_key'),
-    ]);
-
-    $beams->publishToUsers(
-        ['driver:' . $driver->id],
-        [
-            'web' => [
-                'notification' => [
-                    'title' => 'Test Notif',
-                    'body'  => 'Kalau ini muncul, berarti setUserId + SW sudah OK.',
-                    'deep_link' => url('/driver/dashboard'),
-                ],
-            ],
-        ]
-    );
-
-    return 'sent';
-})->middleware('auth');
-
-
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
@@ -87,6 +65,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
         Route::put('/{trip}', [TripController::class, 'update'])->name('admin.trips.update');
         Route::delete('/{trip}', [TripController::class, 'destroy'])->name('admin.trips.destroy');
         Route::get('/check', [TripController::class, 'checkNew'])->name('admin.trips.check');
+
+
+        Route::get('{trip}/export/basic', [TripExportController::class, 'basic'])->name('admin.trips.export.basic');
+        Route::get('{trip}/export/special', [TripExportController::class, 'special'])->name('admin.trips.export.special');
     });
 });
 

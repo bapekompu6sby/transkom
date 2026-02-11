@@ -20,6 +20,10 @@ class Trip extends Model
         'notes_cancel',
         'start_at',
         'end_at',
+        'requester_position',
+        'organization_name',
+        'purpose',
+        'participant_count',
     ];
 
     protected $casts = [

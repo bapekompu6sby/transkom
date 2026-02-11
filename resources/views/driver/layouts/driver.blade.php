@@ -39,6 +39,13 @@
         window.__DRIVER_ID__ = {{ auth('driver')->id() }};
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script type="module">
+        import {
+            initDriverBeams
+        } from "{{ Vite::asset('resources/js/beams-driver.js') }}";
+        initDriverBeams({{ (int) auth('driver')->id() }});
+    </script>
+
 
 </head>
 
@@ -105,8 +112,6 @@
         });
     </script>
     @stack('scripts')
-
-
 </body>
 
 </html>

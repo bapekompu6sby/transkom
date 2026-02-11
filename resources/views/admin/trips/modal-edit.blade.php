@@ -137,6 +137,45 @@
                                 </div>
                             </div>
                         </div>
+                        {{-- SECTION: Surat Khusus (Opsional) --}}
+                        <div class="rounded-xl border border-gray-200 bg-white p-4 space-y-4">
+                            <p class="text-sm font-semibold text-gray-900">Surat Khusus (Opsional)</p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700">Jabatan Pemohon</label>
+                                    <input type="text" name="requester_position" class="form-control rounded-lg"
+                                        value="{{ old('requester_position', $trip->requester_position) }}"
+                                        placeholder="Contoh: Pengelola Asrama">
+                                </div>
+
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700">Instansi / Pemakai</label>
+                                    <input type="text" name="organization_name" class="form-control rounded-lg"
+                                        value="{{ old('organization_name', $trip->organization_name) }}"
+                                        placeholder="Contoh: IPPU JATIM">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">Keperluan</label>
+                                <textarea name="purpose" rows="2" class="form-control rounded-lg"
+                                    placeholder="Contoh: Dinas Kunjungan IPPU Jatim">{{ old('purpose', $trip->purpose) }}</textarea>
+                            </div>
+
+                            <div class="md:w-1/2">
+                                <label class="text-sm font-medium text-gray-700">Jumlah Peserta</label>
+                                <input type="number" min="1" name="participant_count"
+                                    class="form-control rounded-lg"
+                                    value="{{ old('participant_count', $trip->participant_count) }}"
+                                    placeholder="Contoh: 25">
+                            </div>
+
+                            <p class="text-xs text-gray-500">
+                                Isi bagian ini hanya jika perlu untuk keperluan “Surat Khusus”.
+                            </p>
+                        </div>
+
 
                         {{-- SECTION: Catatan --}}
                         <div class="rounded-xl border border-gray-200 bg-white p-4 space-y-4">
@@ -165,7 +204,8 @@
 
                     {{-- Footer --}}
                     <div class="modal-footer border-0 flex gap-2">
-                        <button type="button" class="btn btn-light rounded-lg flex-1 py-2.5" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-light rounded-lg flex-1 py-2.5"
+                            data-bs-dismiss="modal">
                             Batal
                         </button>
 

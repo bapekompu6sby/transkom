@@ -40,6 +40,8 @@
 </head>
 
 <body class="bg-gray-50">
+
+
     <div x-data="{ sidebarOpen: false }" @keydown.escape.window="sidebarOpen = false"
         x-effect="document.body.classList.toggle('overflow-hidden', sidebarOpen)" class="relative flex h-screen">
 
@@ -73,8 +75,8 @@
             </main>
         </div>
 
-        @include('admin.layouts.toast')
     </div>
+    @include('admin.layouts.toast')
     <script>
         window.lastSeenOrderId = {{ (int) ($lastSeenId ?? 0) }};
     </script>

@@ -32,32 +32,43 @@ class TripController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'car_id'          => ['required', 'integer', 'exists:cars,id'],
-            'driver_required' => ['required', 'boolean'],
-            'destination'     => ['required', 'string', 'max:255'],
-            'start_at'        => ['required', 'date_format:Y-m-d\TH:i'],
-            'end_at'          => ['required', 'date_format:Y-m-d\TH:i', 'after:start_at'],
-            'notes'           => ['nullable', 'string'],
+            'car_id'              => ['required', 'integer', 'exists:cars,id'],
+
+            // form kamu pakai select "0/1" -> validasinya paling aman pakai in:0,1
+            'driver_required'     => ['required', 'in:0,1'],
+
+            'requester_name'      => ['nullable', 'string', 'max:255'],
+            'requester_position'  => ['nullable', 'string', 'max:255'],
+            'organization_name'   => ['nullable', 'string', 'max:255'],
+            'purpose'             => ['nullable', 'string'], // text
+            'participant_count'   => ['nullable', 'integer', 'min:1'],
+
+            'destination'         => ['required', 'string', 'max:255'],
+            'start_at'            => ['required', 'date_format:Y-m-d\TH:i'],
+            'end_at'              => ['required', 'date_format:Y-m-d\TH:i', 'after:start_at'],
+
+            'notes'               => ['nullable', 'string'],
         ]);
 
         $userId = Auth::id();
-        $requesterName = Auth::user()->name;
+
+        // requester_name: ambil dari form kalau diisi, kalau kosong fallback ke user login
+        $requesterName = trim((string)($validated['requester_name'] ?? ''));
+        if ($requesterName === '') {
+            $requesterName = Auth::user()->name;
+        }
 
         $driverRequired = (int) $validated['driver_required'];
 
-        // parse datetime-local dengan format yang tepat
         $startAt = Carbon::createFromFormat('Y-m-d\TH:i', $validated['start_at']);
         $endAt   = Carbon::createFromFormat('Y-m-d\TH:i', $validated['end_at']);
 
         DB::beginTransaction();
 
         try {
-
-
-            // ambil list jadwal yang overlap (bukan cuma exists)
             $overlaps = Trip::query()
                 ->where('car_id', $validated['car_id'])
-                ->whereIn('status', ['approved'])
+                ->whereIn('status', ['approved']) // kalau nanti ada 'ongoing' bisa ditambah
                 ->where(function ($q) use ($startAt, $endAt) {
                     $q->where('start_at', '<', $endAt)
                         ->where('end_at', '>', $startAt);
@@ -68,7 +79,6 @@ class TripController extends Controller
             if ($overlaps->isNotEmpty()) {
                 DB::rollBack();
 
-                // format jadwal tabrakan
                 $fmt = fn($dt) => Carbon::parse($dt)->translatedFormat('d M Y, H:i');
 
                 $list = $overlaps->map(function ($t) use ($fmt) {
@@ -81,75 +91,84 @@ class TripController extends Controller
                     ->with('failed', "Kendaraan sudah terjadwal pada rentang waktu ini: {$list}");
             }
 
-
             Trip::create([
-                'car_id'          => $validated['car_id'],
-                'user_id'         => $userId,
-                'driver_required' => $driverRequired,
-                'driver_id'       => null,
-                'requester_name'  => $requesterName,
-                'destination'     => $validated['destination'],
-                'status'          => 'pending',
-                'notes'           => $validated['notes'] ?? null,
-                'notes_cancel'    => null,
-                'start_at'        => $startAt,
-                'end_at'          => $endAt,
+                'car_id'             => $validated['car_id'],
+                'user_id'            => $userId,
+                'driver_required'    => $driverRequired,
+                'driver_id'          => null,
+
+                'requester_name'     => $requesterName,
+                'requester_position' => $validated['requester_position'] ?? null,
+                'organization_name'  => $validated['organization_name'] ?? null,
+                'purpose'            => $validated['purpose'] ?? null,
+                'participant_count'  => $validated['participant_count'] ?? null,
+
+                'destination'        => $validated['destination'],
+                'status'             => 'pending',
+
+                'notes'              => $validated['notes'] ?? null,
+                'notes_cancel'       => null,
+
+                'start_at'           => $startAt,
+                'end_at'             => $endAt,
             ]);
 
             DB::commit();
 
-            return redirect()->route('user.dashboard')
+            return redirect()
+                ->route('user.dashboard')
                 ->with('success', 'Pengajuan peminjaman berhasil dikirim. Menunggu persetujuan admin.');
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
 
-            return redirect()->route('user.dashboard')
+            return redirect()
+                ->route('user.dashboard')
                 ->withInput()
                 ->with('failed', 'Terjadi kesalahan saat menyimpan pengajuan. Coba lagi atau hubungi admin.');
         }
     }
 
 
+
     public function update(Request $request, Trip $trip)
     {
         try {
-            // 1) Validasi dasar
             $validated = $request->validate([
-                'car_id'          => ['required', 'integer', 'exists:cars,id'],
-                'requester_name'  => ['nullable', 'string', 'max:255'],
-                'destination'     => ['required', 'string', 'max:255'],
+                'car_id'             => ['required', 'integer', 'exists:cars,id'],
+                'requester_name'     => ['nullable', 'string', 'max:255'],
+                'destination'        => ['required', 'string', 'max:255'],
 
-                'driver_required' => ['required', 'boolean'],
-                'driver_id'       => ['nullable', 'integer', 'exists:drivers,id', 'required_if:driver_required,1'],
+                // ✅ lebih aman dari boolean karena dari select biasanya "0"/"1"
+                'driver_required'    => ['required', 'in:0,1'],
+                'driver_id'          => ['nullable', 'integer', 'exists:drivers,id', 'required_if:driver_required,1'],
 
-                'status'          => ['required', Rule::in(['pending', 'approved', 'cancelled'])],
+                // ✅ field surat khusus (opsional)
+                'requester_position' => ['nullable', 'string', 'max:255'],
+                'organization_name'  => ['nullable', 'string', 'max:255'],
+                'purpose'            => ['nullable', 'string'],
+                'participant_count'  => ['nullable', 'integer', 'min:1'],
 
-                'start_at'        => ['required', 'date'],
-                'end_at'          => ['required', 'date', 'after:start_at'],
+                'status'             => ['required', Rule::in(['pending', 'approved', 'cancelled'])],
+                'start_at'           => ['required', 'date'],
+                'end_at'             => ['required', 'date', 'after:start_at'],
 
-                'notes'           => ['nullable', 'string'],
-                'notes_cancel'    => ['nullable', 'string'],
+                'notes'              => ['nullable', 'string'],
+                'notes_cancel'       => ['nullable', 'string'],
             ]);
 
             $driverRequired = (int) $validated['driver_required'];
 
-            // 2) Validasi conditional: kalau butuh sopir, driver_id wajib
             if ($driverRequired === 1 && empty($validated['driver_id'])) {
                 throw ValidationException::withMessages([
                     'driver_id' => 'Sopir wajib dipilih jika kebutuhan sopir = Dengan sopir.',
                 ]);
             }
 
-            // 3) Normalisasi: kalau tanpa sopir, paksa driver_id null
             $driverId = $driverRequired === 1 ? (int) $validated['driver_id'] : null;
 
             $startAt = Carbon::parse($validated['start_at']);
             $endAt   = Carbon::parse($validated['end_at']);
-
-            $oldDriverId = $trip->driver_id;
-            $oldStatus   = $trip->status;
-
 
             DB::beginTransaction();
 
@@ -159,7 +178,7 @@ class TripController extends Controller
                 $overlapTrip = Trip::query()
                     ->where('car_id', $validated['car_id'])
                     ->where('id', '!=', $trip->id)
-                    ->whereIn('status', ['approved']) // atau ['pending','approved'] kalau pending juga ngunci
+                    ->whereIn('status', ['approved'])
                     ->where(function ($q) use ($startAt, $endAt) {
                         $q->where('start_at', '<', $endAt)
                             ->where('end_at', '>', $startAt);
@@ -168,45 +187,38 @@ class TripController extends Controller
 
                 if ($overlapTrip) {
                     DB::rollBack();
-
                     return back()
                         ->withInput()
-                        ->with(
-                            'failed',
-                            'Jadwal bentrok pada waktu ' .
-                                $overlapTrip->start_at->format('d M Y H:i') .
-                                ' - ' .
-                                $overlapTrip->end_at->format('d M Y H:i')
-                        );
+                        ->with('failed', 'Jadwal bentrok pada waktu ' .
+                            $overlapTrip->start_at->format('d M Y H:i') .
+                            ' - ' . $overlapTrip->end_at->format('d M Y H:i'));
                 }
             }
-            // 5) Update data
+
             $trip->update([
-                'car_id'         => (int) $validated['car_id'],
-                'requester_name' => $validated['requester_name'] ?? null,
-                'destination'    => $validated['destination'],
+                'car_id'             => (int) $validated['car_id'],
+                'requester_name'     => $validated['requester_name'] ?? null,
+                'destination'        => $validated['destination'],
 
-                'driver_required' => $driverRequired,
-                'driver_id'      => $driverId,
+                'driver_required'    => $driverRequired,
+                'driver_id'          => $driverId,
 
-                'status'         => $validated['status'],
-                'notes'          => $validated['notes'] ?? null,
-                'notes_cancel'   => $validated['notes_cancel'] ?? null,
+                // ✅ simpan field surat khusus
+                'requester_position' => $validated['requester_position'] ?? null,
+                'organization_name'  => $validated['organization_name'] ?? null,
+                'purpose'            => $validated['purpose'] ?? null,
+                'participant_count'  => $validated['participant_count'] ?? null,
 
-                'start_at'       => $startAt,
-                'end_at'         => $endAt,
+                'status'             => $validated['status'],
+                'notes'              => $validated['notes'] ?? null,
+                'notes_cancel'       => $validated['notes_cancel'] ?? null,
 
-
+                'start_at'           => $startAt,
+                'end_at'             => $endAt,
             ]);
 
-            DB::afterCommit(function () use ($trip,  $driverId) {
-
-                // Wajib ada driver, kalau tidak ada ya stop
-                if (empty($driverId)) {
-                    return;
-                }
-
-
+            DB::afterCommit(function () use ($trip, $driverId) {
+                if (empty($driverId)) return;
 
                 try {
                     $beams = new \Pusher\PushNotifications\PushNotifications([
@@ -216,7 +228,7 @@ class TripController extends Controller
 
                     $userId = 'driver:' . (int) $driverId;
 
-                    $title = $driverId ? 'Penugasan Baru 🚗' : 'Trip Di-approve ✅';
+                    $title = 'Penugasan Baru 🚗';
                     $body  = "Trip ke {$trip->destination} (" .
                         $trip->start_at->format('d M Y H:i') . " - " .
                         $trip->end_at->format('d M Y H:i') . ")";
@@ -226,17 +238,14 @@ class TripController extends Controller
                             'notification' => [
                                 'title' => $title,
                                 'body' => $body,
-                                'deep_link' => url('/driver/dashboard'),
+                                'deep_link' => url('/login-driver'), // ganti dengan URL yang sesuai untuk driver
                             ],
                         ],
                     ]);
                 } catch (\Throwable $e) {
-                    // jangan bikin request gagal, cukup log
                     report($e);
                 }
             });
-
-
 
             DB::commit();
 
@@ -257,6 +266,7 @@ class TripController extends Controller
                 ->with('failed', 'Terjadi kesalahan saat update peminjaman. Coba lagi.');
         }
     }
+
 
     public function destroy(Trip $trip)
     {
