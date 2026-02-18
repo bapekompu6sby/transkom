@@ -46,7 +46,11 @@
 
         {{-- Sidebar Desktop (tampil md ke atas) --}}
         <div class="hidden md:flex">
-            @include('user.layouts.sidebar')
+            @if (auth()->user()->role === 'admin')
+                @include('admin.layouts.sidebar')
+            @else
+                @include('user.layouts.sidebar')
+            @endif
         </div>
 
 

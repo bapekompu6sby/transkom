@@ -32,7 +32,7 @@
                 </a>
 
                 <!-- SUBMENU -->
-                <ul id="driver-menu" class="submenu ml-4 mt-2 pl-4 border-l border-gray-300 space-y-1">
+                <ul id="driver-menu" class="submenu ml-1 mt-2 pl-1 border-l border-gray-300 space-y-1">
 
                     <li>
                         <a href="{{ route('admin.drivers.index') }}"
@@ -51,7 +51,7 @@
                 </a>
 
                 <!-- SUBMENU -->
-                <ul id="car-menu" class="submenu ml-4 mt-2 pl-4 border-l border-gray-300 space-y-1">
+                <ul id="car-menu" class="submenu ml-1 mt-2 pl-1 border-l border-gray-300 space-y-1">
 
                     <li>
                         <a href="{{ route('admin.cars.index') }}"
@@ -63,12 +63,27 @@
                 </ul>
             </li>
             <li>
-                <a href="{{route('admin.trips.index') }}"
-                    class="flex items-center px-1 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition">
-                    <span class="ml-2">Peminjaman</span>
+                <a href="#" data-toggle="collapse" data-target="#trip-menu"
+                    class="flex items-center px-0 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">
+                    <span class="ml-3 flex-1">Peminjaman</span>
+                    <i class="fas fa-chevron-down w-4 h-4 toggle-icon transition-transform"></i>
                 </a>
+                <!-- SUBMENU -->
+                <ul id="trip-menu" class="submenu ml-1 mt-2 pl-1 border-l border-gray-300 space-y-1">
+                    <li>
+                        <a href="{{ route('admin.trips.index') }}"
+                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                            <span class="ml-2">Manajemen Peminjaman</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('user.dashboard') }}"
+                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                            <span class="ml-2">Manambahkan Peminjaman</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
-
         </ul>
     </nav>
 </aside>

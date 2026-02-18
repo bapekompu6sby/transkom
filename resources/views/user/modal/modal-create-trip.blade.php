@@ -55,6 +55,33 @@
                         {{-- STEP 1: Inti perjalanan --}}
                         <div class="wizard-step" data-step="1">
                             <div class="mb-3">
+                                <label class="form-label mb-2">Jenis perjalanan</label>
+
+                                <div class="btn-group w-100" role="group" aria-label="Jenis perjalanan">
+                                    <input type="radio" class="btn-check" name="trip_type"
+                                        id="tripRegular-{{ $car->id }}" value="regular"
+                                        {{ old('trip_type', 'regular') === 'regular' ? 'checked' : '' }}>
+
+                                    <label class="btn btn-outline-dark" for="tripRegular-{{ $car->id }}">
+                                        Biasa
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="trip_type"
+                                        id="tripSpecial-{{ $car->id }}" value="special"
+                                        {{ old('trip_type') === 'special' ? 'checked' : '' }}>
+
+                                    <label class="btn btn-outline-dark" for="tripSpecial-{{ $car->id }}">
+                                        Khusus
+                                    </label>
+                                </div>
+
+                                <div class="form-text">
+                                    Biasa: ringkas. Khusus: wajib data dinas.
+                                </div>
+                            </div>
+
+
+                            <div class="mb-3">
                                 <label class="form-label">Tujuan</label>
                                 <input type="text" name="destination" class="form-control rounded-3"
                                     placeholder="Contoh: Surabaya" value="{{ $oldDest }}" required>
@@ -72,10 +99,6 @@
                                         value="{{ $oldEnd }}" required>
                                 </div>
                             </div>
-
-                            <small class="text-muted d-block mt-2">
-                                Isi inti dulu—detail lain belakangan biar nggak capek 😄
-                            </small>
                         </div>
 
                         {{-- STEP 2: Pemohon --}}
@@ -83,21 +106,27 @@
                             <div class="mb-3">
                                 <label class="form-label">Pengaju</label>
                                 <input type="text" name="requester_name" class="form-control rounded-3"
-                                    value="{{ $oldRequester }}">
+                                    value="{{ $oldRequester }}" required>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Jabatan</label>
                                 <input type="text" name="requester_position" class="form-control rounded-3"
                                     placeholder="Contoh: Pengelola Asrama"
-                                    value="{{ $isOld ? old('requester_position') : '' }}">
+                                    value="{{ $isOld ? old('requester_position') : '' }}" data-special>
                             </div>
 
                             <div class="mb-0">
                                 <label class="form-label">Instansi / Pemakai</label>
                                 <input type="text" name="organization_name" class="form-control rounded-3"
                                     placeholder="Contoh: BAPEKOM VI Surabaya"
-                                    value="{{ $isOld ? old('organization_name') : '' }}">
+                                    value="{{ $isOld ? old('organization_name') : '' }}" data-special>
+                            </div>
+                            {{-- nip --}}
+                            <div class="mb-3">
+                                <label class="form-label">NIP</label>
+                                <input type="text" name="nip" class="form-control rounded-3"
+                                    placeholder="Contoh: 198001012010011001" value="{{ $isOld ? old('nip') : '' }}" data-special>
                             </div>
                         </div>
 
@@ -106,20 +135,22 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Keperluan</label>
-                                <textarea name="purpose" class="form-control rounded-3" rows="2" placeholder="Contoh: Dinas Kunjungan IPPU Jatim">{{ $isOld ? old('purpose') : '' }}</textarea>
+                                <textarea name="purpose" class="form-control rounded-3" rows="2"
+                                    placeholder="Contoh: Dinas Kunjungan IPPU Jatim" data-special>{{ $isOld ? old('purpose') : '' }}</textarea>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Jumlah Peserta</label>
                                 <input type="number" name="participant_count" min="1"
                                     class="form-control rounded-3" placeholder="Contoh: 25"
-                                    value="{{ $isOld ? old('participant_count') : '' }}">
+                                    value="{{ $isOld ? old('participant_count') : '' }}" data-special>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Kebutuhan Sopir</label>
                                 <select name="driver_required" class="form-select rounded-3" required>
-                                    <option value="0" {{ (string) $oldDriverReq === '0' ? 'selected' : '' }}>Tanpa
+                                    <option value="0" {{ (string) $oldDriverReq === '0' ? 'selected' : '' }}>
+                                        Tanpa
                                         sopir</option>
                                     <option value="1" {{ (string) $oldDriverReq === '1' ? 'selected' : '' }}>
                                         Dengan sopir</option>
@@ -167,7 +198,12 @@
                                     <span class="text-muted">Jabatan</span>
                                     <span class="fw-semibold text-end ms-3" data-review="requester_position">-</span>
                                 </div>
-
+                                {{-- nip --}}
+                                <hr class="my-2">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">NIP</span>
+                                    <span class="fw-semibold text-end ms-3" data-review="nip">-</span>
+                                </div>
                                 <hr class="my-2">
                                 <div class="d-flex justify-content-between">
                                     <span class="text-muted">Instansi</span>
@@ -230,6 +266,46 @@
         })();
     </script>
 @endif
+<script>
+    (() => {
+        const setMode = (form) => {
+            const mode = form.querySelector('[name="trip_type"]:checked')?.value || 'regular';
+            const specialEls = form.querySelectorAll('[data-special]');
+
+            specialEls.forEach((el) => {
+                const wrap = el.closest('.mb-3') || el.closest('.col') || el.parentElement;
+
+                if (mode === 'special') {
+                    // tampilkan + wajib
+                    if (wrap) wrap.classList.remove('d-none');
+                    el.required = true;
+                } else {
+                    // sembunyikan + tidak wajib + kosongkan nilai biar gak nyangkut
+                    if (wrap) wrap.classList.add('d-none');
+                    el.required = false;
+                    if (el.tagName === 'SELECT' || el.tagName === 'TEXTAREA' || el.tagName ===
+                        'INPUT') {
+                        el.value = '';
+                    }
+                }
+            });
+        };
+
+        document.querySelectorAll('form[data-trip-wizard]').forEach((form) => {
+            // initial
+            setMode(form);
+
+            // on change
+            form.querySelectorAll('[name="trip_type"]').forEach((r) => {
+                r.addEventListener('change', () => setMode(form));
+            });
+
+            // kalau modal dibuka ulang, reset lagi
+            const modal = form.closest('.modal');
+            modal?.addEventListener('shown.bs.modal', () => setMode(form));
+        });
+    })();
+</script>
 
 <script>
     (() => {
@@ -263,6 +339,7 @@
                 const requester = input('requester_name')?.value?.trim() || '-';
                 const position = input('requester_position')?.value?.trim() || '-';
                 const org = input('organization_name')?.value?.trim() || '-';
+                const nip = input('nip')?.value?.trim() || '-';
 
                 const dest = input('destination')?.value?.trim() || '-';
                 const start = input('start_at')?.value || '';
@@ -290,6 +367,9 @@
 
                 const elOrg = modal.querySelector('[data-review="organization_name"]');
                 if (elOrg) elOrg.textContent = org;
+
+                const elNip = modal.querySelector('[data-review="nip"]');
+                if (elNip) elNip.textContent = nip;
 
                 const elPurpose = modal.querySelector('[data-review="purpose"]');
                 if (elPurpose) elPurpose.textContent = purpose;

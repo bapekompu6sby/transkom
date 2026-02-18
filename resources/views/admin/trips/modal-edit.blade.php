@@ -50,12 +50,28 @@
                                 </div>
                             </div>
 
-                            {{-- Tujuan (full) --}}
-                            <div>
-                                <label class="text-sm font-medium text-gray-700">Tujuan</label>
-                                <input type="text" name="destination" class="form-control rounded-lg"
-                                    value="{{ old('destination', $trip->destination) }}"
-                                    placeholder="Contoh: Kegiatan dinas ke Surabaya" required>
+                            {{-- Tujuan --}}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700">Tujuan</label>
+                                    <input type="text" name="destination" class="form-control rounded-lg"
+                                        value="{{ old('destination', $trip->destination) }}"
+                                        placeholder="Contoh: Kegiatan dinas ke Surabaya" required>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700">Jenis Perjalanan</label>
+                                    <select name="trip_type" class="form-control rounded-lg" required>
+                                        <option value="regular"
+                                            {{ old('trip_type', $trip->trip_type) == 'regular' ? 'selected' : '' }}>
+                                            Perjalanan Biasa
+                                        </option>
+                                        <option value="special"
+                                            {{ old('trip_type', $trip->trip_type) == 'special' ? 'selected' : '' }}>
+                                            Perjalanan Khusus
+                                        </option>
+                                    </select>
+                                </div>
+
                             </div>
                         </div>
 
@@ -69,7 +85,8 @@
                                     <label class="text-sm font-medium text-gray-700">Kebutuhan Sopir</label>
                                     <select name="driver_required" class="form-select rounded-lg trip-driver-required"
                                         data-trip-id="{{ $trip->id }}" required>
-                                        <option value="0" {{ (string) $driverReqValue === '0' ? 'selected' : '' }}>
+                                        <option value="0"
+                                            {{ (string) $driverReqValue === '0' ? 'selected' : '' }}>
                                             Tanpa sopir</option>
                                         <option value="1"
                                             {{ (string) $driverReqValue === '1' ? 'selected' : '' }}>Dengan sopir
@@ -162,13 +179,20 @@
                                 <textarea name="purpose" rows="2" class="form-control rounded-lg"
                                     placeholder="Contoh: Dinas Kunjungan IPPU Jatim">{{ old('purpose', $trip->purpose) }}</textarea>
                             </div>
-
-                            <div class="md:w-1/2">
-                                <label class="text-sm font-medium text-gray-700">Jumlah Peserta</label>
-                                <input type="number" min="1" name="participant_count"
-                                    class="form-control rounded-lg"
-                                    value="{{ old('participant_count', $trip->participant_count) }}"
-                                    placeholder="Contoh: 25">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700">Jumlah Peserta</label>
+                                    <input type="number" min="1" name="participant_count"
+                                        class="form-control rounded-lg"
+                                        value="{{ old('participant_count', $trip->participant_count) }}"
+                                        placeholder="Contoh: 25">
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700">NIP</label>
+                                    <input type="text" name="nip" class="form-control rounded-lg"
+                                        value="{{ old('nip', $trip->nip) }}"
+                                        placeholder="Contoh: 198702122015031001">
+                                </div>
                             </div>
 
                             <p class="text-xs text-gray-500">

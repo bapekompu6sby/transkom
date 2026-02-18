@@ -97,10 +97,11 @@
             font-size: 11pt;
         }
 
-        
+
         .space-ttd {
             margin-top: 17.5px;
         }
+
         .space-before-next {
             margin-top: 35px;
             /* jarak sebelum PERINTAH JALAN */
@@ -123,7 +124,7 @@
             : $start->translatedFormat('d F Y') . ' s/d ' . $end->translatedFormat('d F Y');
 
         // gaya dokumen: "jam berangkat ... sampai selesai"
-        $jamBerangkat = $start->format('H.i') . ' sampai selesai';
+        $jamBerangkat = $start->format('H.i') . ' – ' . $end->format('H.i');
 
         $days = max(
             1,
@@ -133,7 +134,12 @@
                 ->diffInDays($end->copy()->startOfDay()) + 1,
         );
 
-        $nomor = 'UM 02 04 –1869.' . str_pad($trip->id, 2, '0', STR_PAD_LEFT);
+        $nomor =
+            $trip->created_at->format('d m') .
+            ' - ' .
+            $trip->created_at->format('Y') .
+            '.' .
+            str_pad($trip->id, 2, '0', STR_PAD_LEFT);
 
         $pemohonNama = $trip->requester_name ?? '-';
         $pemohonJabatan = $trip->requester_position ?? '-';
@@ -153,7 +159,33 @@
         $petugasNama = 'Sunaryo';
         $petugasNip = '197304172008121001';
 
-        $pemohonNip = $trip->user->nip ?? '-';
+        $pemohonNip = $trip->nip ?? '-';
+
+        function toRoman($month)
+        {
+            $romans = [
+                1 => 'I',
+                2 => 'II',
+                3 => 'III',
+                4 => 'IV',
+                5 => 'V',
+                6 => 'VI',
+                7 => 'VII',
+                8 => 'VIII',
+                9 => 'IX',
+                10 => 'X',
+                11 => 'XI',
+                12 => 'XII',
+            ];
+            return $romans[$month];
+        }
+
+        $nomorHeader = sprintf(
+            'F-01/DM/P-TU/%03d/BD04/%s/%d',
+            $trip->id,
+            toRoman($trip->created_at->month),
+            $trip->created_at->year,
+        );
 
     @endphp
 
@@ -162,7 +194,7 @@
         <div class="center">
             <p class="title">PERMOHONAN</p>
             <p class="sub small">ANGKUTAN KENDARAAN BERMOTOR KENDARAAN DINAS</p>
-            <p class="code">(F-01/DM/P/TU/10//BD04. Ref : 00)</p>
+            <p class="code">{{ $nomorHeader }}</p>
             <p class="code bold">(DIISI PEMOHON)</p>
         </div>
         <div class="hr"></div>
@@ -246,7 +278,7 @@
         <div class="center">
             <p class="title">PERINTAH JALAN</p>
             <p class="sub small">ANGKUTAN BERMOTOR KENDARAAN DINAS</p>
-            <p class="code">(F-01/DM/P/TU/10//BD04. Ref : 00)</p>
+            <p class="code">{{ $nomorHeader }}</p>
             <p class="code">Nomor : <span class="bold">{{ $nomor }}</span></p>
         </div>
         <div class="hr"></div>

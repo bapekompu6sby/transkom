@@ -33,6 +33,8 @@ class TripController extends Controller
     {
         $validated = $request->validate([
             'car_id'              => ['required', 'integer', 'exists:cars,id'],
+            'nip'                 => ['nullable', 'string', 'max:255'], // field NIP baru
+            'trip_type'            => ['required'], // field jenis trip baru
 
             // form kamu pakai select "0/1" -> validasinya paling aman pakai in:0,1
             'driver_required'     => ['required', 'in:0,1'],
@@ -93,6 +95,8 @@ class TripController extends Controller
 
             Trip::create([
                 'car_id'             => $validated['car_id'],
+                'nip'                => $validated['nip'] ?? null, // simpan NIP
+                'trip_type'          => $validated['trip_type'], // simpan jenis trip
                 'user_id'            => $userId,
                 'driver_required'    => $driverRequired,
                 'driver_id'          => null,
@@ -136,6 +140,8 @@ class TripController extends Controller
         try {
             $validated = $request->validate([
                 'car_id'             => ['required', 'integer', 'exists:cars,id'],
+                'nip'                => ['nullable', 'string', 'max:255'], // field NIP baru
+                'trip_type'          => ['required'], // field jenis trip baru
                 'requester_name'     => ['nullable', 'string', 'max:255'],
                 'destination'        => ['required', 'string', 'max:255'],
 
@@ -197,6 +203,8 @@ class TripController extends Controller
 
             $trip->update([
                 'car_id'             => (int) $validated['car_id'],
+                'nip'                => $validated['nip'] ?? null, // simpan NIP
+                'trip_type'          => $validated['trip_type'], // simpan jenis trip
                 'requester_name'     => $validated['requester_name'] ?? null,
                 'destination'        => $validated['destination'],
 
