@@ -104,7 +104,8 @@
 
         .sign-block {
             width: 70mm;
-            float: right;;
+            float: right;
+            font-size: 12pt;
         }
 
         .sign-space {
