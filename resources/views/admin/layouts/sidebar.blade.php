@@ -82,6 +82,12 @@
                             <span class="ml-2">Manambahkan Peminjaman</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('admin.trips.export') }}"
+                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                            <span class="ml-2">Eksport Peminjaman</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
         </ul>

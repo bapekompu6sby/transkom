@@ -307,4 +307,9 @@ class TripController extends Controller
             ])
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
+
+    public function export()
+    {
+        return view('admin.trips.export');
+    }
 }

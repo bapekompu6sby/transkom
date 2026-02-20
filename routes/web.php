@@ -66,7 +66,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
         Route::delete('/{trip}', [TripController::class, 'destroy'])->name('admin.trips.destroy');
         Route::get('/check', [TripController::class, 'checkNew'])->name('admin.trips.check');
 
+        // sub menu export
+        Route::get('/export', [TripController::class, 'export'])->name('admin.trips.export');
+        Route::post('/export', [TripExportController::class, 'exportRekap'])->name('admin.trips.export.rekap');
 
+        // after action
         Route::get('{trip}/export/basic', [TripExportController::class, 'basic'])->name('admin.trips.export.basic');
         Route::get('{trip}/export/special', [TripExportController::class, 'special'])->name('admin.trips.export.special');
     });
