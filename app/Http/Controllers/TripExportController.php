@@ -69,20 +69,35 @@ class TripExportController extends Controller
             : '';
 
         // Mapping + format tanggal "s/d" jadi STRING (FULL di controller)
-        $items = $trips->map(function ($t) use ($fmt) {
-            $start = $t->start_at ?? $t->created_at;
-            $end   = $t->end_at ?? null; // kalau tidak ada, tetap null
+        $items = $trips->map(function ($t) {
 
-            $tanggal = $fmt($start);
-            if ($end) {
-                $tanggal .= "\n" . 's/d ' . $fmt($end); // newline, nanti di view jadi <br>
+            $start = $t->start_at ?? $t->created_at;
+            $end   = $t->end_at ?? null;
+
+            if (!$start) {
+                $tanggal = '-';
+            } else {
+
+                $startDate = Carbon::parse($start)->locale('id');
+                $endDate   = $end ? Carbon::parse($end)->locale('id') : null;
+
+                if ($endDate && !$startDate->isSameDay($endDate)) {
+                    // beda hari → 10 - 11 Februari 2026
+                    $tanggal =
+                        $startDate->translatedFormat('d') .
+                        ' - ' .
+                        $endDate->translatedFormat('d F Y');
+                } else {
+                    // satu hari → 10 Februari 2026
+                    $tanggal = $startDate->translatedFormat('d F Y');
+                }
             }
 
             return [
-                'nama'    => $t->driver?->name ?? 'tanpa driver',
-                'tujuan'  => $t->destination ?? '-',
-                'nopol'   => $t->car?->plate_number ?? $t->car?->nopol ?? '-',
-                'tanggal' => $tanggal, // SUDAH jadi string final
+                'nama'           => $t->driver?->name ?? 'tanpa driver',
+                'tujuan'         => $t->destination ?? '-',
+                'nopol'          => $t->car?->plate_number ?? $t->car?->nopol ?? '-',
+                'tanggal'        => $tanggal,
                 'requester_name' => $t->requester_name ?? '-',
             ];
         })->values()->all();

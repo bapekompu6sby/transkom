@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 10pt;
+            font-size: 12pt;
             /* ini ukuran resmi dokumen */
             color: #000;
         }
