@@ -79,7 +79,7 @@ class TripExportController extends Controller
             }
 
             return [
-                'nama'    => $t->driver?->name ?? $t->user?->name ?? '-',
+                'nama'    => $t->driver?->name ?? 'tanpa driver',
                 'tujuan'  => $t->destination ?? '-',
                 'nopol'   => $t->car?->plate_number ?? $t->car?->nopol ?? '-',
                 'tanggal' => $tanggal, // SUDAH jadi string final
