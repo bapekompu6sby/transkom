@@ -9,9 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
         searching: true,
         ordering: true,
         pageLength: 10,
-        columnDefs: [
-            { orderable: false, targets: 4 }, // kolom ke-4 = AKSI
-        ],
+        // columnDefs: [
+        //     { orderable: false, targets: 4 }, // kolom ke-4 = AKSI
+        // ],
         language: {
             search: "Cari:",
             lengthMenu: "Tampilkan _MENU_ data",

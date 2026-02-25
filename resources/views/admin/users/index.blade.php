@@ -27,10 +27,7 @@
                             </th>
                             <th class="px-6 py-3 text-left">
                                 <span
-                                    class="text-xs font-semibold text-gray-700 uppercase tracking-wider">No.HP/Wangsaff</span>
-                            </th>
-                            <th class="px-6 py-3 text-left">
-                                <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Aksi</span>
+                                    class="text-xs font-semibold text-gray-700 uppercase tracking-wider">No.HP</span>
                             </th>
                         </tr>
                     </thead>
@@ -47,23 +44,16 @@
                                             <i class="fas fa-user text-gray-600 text-sm"></i>
                                         </div>
                                         <span
-                                            class="text-sm font-medium text-gray-900">{{ $user->name ?? 'Windi Nitasya Lubis' }}</span>
+                                            class="text-sm font-medium text-gray-900">{{ $user->name ?? '-' }}</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="text-sm text-gray-600">{{ $user->email ?? 'arilganteng@gmail.com' }}</span>
+                                    <span class="text-sm text-gray-600">{{ $user->email ?? '-' }}</span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="text-sm text-gray-600">{{ $user->number_phone ?? '089834840846' }}</span>
+                                    <span class="text-sm text-gray-600">{{ $user->number_phone ?? '-' }}</span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3">
-                                        {{-- edit --}}
-                                        <button class="text-gray-400 hover:text-gray-600 transition">
-                                            <i class="fas fa-edit text-lg"></i>
-                                        </button>
-                                    </div>
-                                </td>
+
                             </tr>
                         @empty
                             <tr>

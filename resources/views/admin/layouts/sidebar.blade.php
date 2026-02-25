@@ -25,6 +25,25 @@
             </li>
 
             <li>
+                <a href="#" data-toggle="collapse" data-target="#user-menu"
+                    class="flex items-center px-0 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">
+                    <span class="ml-3 flex-1">Pengguna</span>
+                    <i class="fas fa-chevron-down w-4 h-4 toggle-icon transition-transform"></i>
+                </a>
+
+                <!-- SUBMENU -->
+                <ul id="user-menu" class="submenu ml-1 mt-2 pl-1 border-l border-gray-300 space-y-1">
+
+                    <li>
+                        <a href="{{ route('admin.users.index') }}"
+                            class="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                            <span class="ml-2">Manajemen Pengguna</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            <li>
                 <a href="#" data-toggle="collapse" data-target="#driver-menu"
                     class="flex items-center px-0 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">
                     <span class="ml-3 flex-1">Sopir</span>
