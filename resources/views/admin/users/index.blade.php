@@ -58,7 +58,7 @@
                         @empty
                             <tr>
                                 <td colspan="4" class="px-6 py-8 text-center">
-                                    <p class="text-gray-500">Tidak ada data asisten laboratorium</p>
+                                    <p class="text-gray-500">Tidak ada data pengguna</p>
                                 </td>
                             </tr>
                         @endforelse
