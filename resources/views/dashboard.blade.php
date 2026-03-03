@@ -147,9 +147,9 @@
             </div>
         </div>
         {{-- SECTION BUKU PANDUAN --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
             <div
-                class="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl shadow-lg border border-gray-700 flex flex-col md:flex-row items-center justify-between p-6 md:p-8 md:px-10 gap-6">
+                class="bg-gray-900 rounded-2xl shadow-lg border border-gray-700 flex flex-col md:flex-row items-center justify-between p-6 md:p-8 md:px-10 gap-6">
 
                 {{-- Teks Info --}}
                 <div class="text-center md:text-left">
@@ -167,8 +167,10 @@
                     </p>
                 </div>
 
-                {{-- Tombol Lihat Buku --}}
-                <a href="{{ asset('buku-panduan.pdf') }}" target="_blank"
+                {{-- Tombol Lihat Buku (target="_blank" agar buka tab baru, tidak auto download) --}}
+                {{-- Sesuaikan 'buku-panduan.pdf' dengan nama file asli di dalam folder public kamu --}}
+                {{-- {{ asset('buku-panduan.pdf') }} --}}
+                <a href="#" target="_blank"
                     class="shrink-0 px-6 py-3 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-md flex items-center gap-2">
                     Lihat Buku Panduan
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
