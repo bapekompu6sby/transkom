@@ -101,10 +101,10 @@
                 ›
             </button>
 
-            {{-- ✅ VIEWPORT: dibatasi 4 card + ditaruh center --}}
-            <div class="mx-auto overflow-hidden" style="width: calc((320px * 4) + (24px * 3));">
+            {{-- ✅ VIEWPORT: Responsif (Full di HP, Center di Desktop) --}}
+            <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 overflow-hidden">
                 <div id="carsTrack"
-                    class="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2
+                    class="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4
                    [scrollbar-width:none] [-ms-overflow-style:none]">
                     <style>
                         #carsTrack::-webkit-scrollbar {
@@ -113,39 +113,71 @@
                     </style>
 
                     @foreach ($cars ?? [] as $car)
+                        {{-- Perubahan: Lebar card 260px di HP, 320px di Desktop. Snap-center di HP --}}
                         <div
-                            class="snap-start shrink-0 w-[320px] bg-white border border-gray-200
+                            class="snap-center sm:snap-start shrink-0 w-[260px] sm:w-[320px] bg-white border border-gray-200
                             rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden">
+
                             {{-- gambar --}}
-                            <div class="h-44 bg-gray-50 flex items-center justify-center">
+                            <div class="h-40 sm:h-44 bg-gray-50 flex items-center justify-center">
                                 @if (!empty($car->image_url))
                                     <img src="{{ asset('storage/' . $car->image_url) }}" alt="{{ $car->name }}"
                                         class="h-full w-full object-cover">
                                 @else
                                     <div
-                                        class="h-20 w-20 rounded-full border-4 border-gray-900/80 grid place-items-center">
-                                        <span class="text-2xl font-bold text-gray-900">🚗</span>
+                                        class="h-16 w-16 sm:h-20 sm:w-20 rounded-full border-4 border-gray-900/80 grid place-items-center">
+                                        <span class="text-xl sm:text-2xl font-bold text-gray-900">🚗</span>
                                     </div>
                                 @endif
                             </div>
 
                             {{-- konten --}}
-                            <div class="p-5 text-center">
-                                <div class="text-lg font-semibold text-gray-900">{{ $car->name }}</div>
-                                <div class="text-sm text-gray-500 mt-1">{{ $car->type ?? 'Kendaraan Operasional' }}
+                            <div class="p-4 sm:p-5 text-center">
+                                <div class="text-base sm:text-lg font-semibold text-gray-900">{{ $car->name }}</div>
+                                <div class="text-xs sm:text-sm text-gray-500 mt-1">
+                                    {{ $car->type ?? 'Kendaraan Operasional' }}
                                 </div>
-                                <div class="text-xl font-bold text-gray-900 mt-4">{{ $car->plate_number ?? '-' }}</div>
-                                {{-- <div class="mt-4">
-                                    <span
-                                        class="inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-gray-900 text-white">
-                                        {{ $car->category ?? 'Mobil' }}
-                                    </span>
-                                </div> --}}
+                                <div class="text-lg sm:text-xl font-bold text-gray-900 mt-3 sm:mt-4">
+                                    {{ $car->plate_number ?? '-' }}</div>
                             </div>
                         </div>
                     @endforeach
 
                 </div>
+            </div>
+        </div>
+        {{-- SECTION BUKU PANDUAN --}}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+            <div
+                class="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl shadow-lg border border-gray-700 flex flex-col md:flex-row items-center justify-between p-6 md:p-8 md:px-10 gap-6">
+
+                {{-- Teks Info --}}
+                <div class="text-center md:text-left">
+                    <h3
+                        class="text-xl md:text-2xl font-bold text-white flex items-center justify-center md:justify-start gap-2">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                            </path>
+                        </svg>
+                        Butuh Bantuan Penggunaan Sistem?
+                    </h3>
+                    <p class="text-gray-300 mt-2 text-sm md:text-base">
+                        Baca buku panduan lengkap langkah demi langkah pengajuan peminjaman kendaraan operasional.
+                    </p>
+                </div>
+
+                {{-- Tombol Lihat Buku (target="_blank" agar buka tab baru, tidak auto download) --}}
+                {{-- Sesuaikan 'buku-panduan.pdf' dengan nama file asli di dalam folder public kamu --}}
+                {{-- {{ asset('buku-panduan.pdf') }} --}}
+                <a href="#" target="_blank"
+                    class="shrink-0 px-6 py-3 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-md flex items-center gap-2">
+                    Lihat Buku Panduan
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
+                </a>
             </div>
         </div>
 
