@@ -1,20 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CarController;
-use App\Http\Controllers\TripController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\DriverController;
-use App\Http\Controllers\HistoryController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DriverUIController;
-use App\Http\Controllers\TripExportController;
-use App\Http\Controllers\DriverBeamsController;
-use App\Http\Controllers\LayoutsUserController;
-use App\Http\Controllers\DashboardAdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\CarController;
+use App\Http\Controllers\DashboardAdminController;
+use App\Http\Controllers\DashboardGuestController;
+use App\Http\Controllers\DriverBeamsController;
+use App\Http\Controllers\DriverController;
+use App\Http\Controllers\DriverUIController;
+use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LayoutsUserController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TripController;
+use App\Http\Controllers\TripExportController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('/');
+
+Route::get('/', [HomeController::class, 'index']);
+
+Route::get('dashboard', [DashboardGuestController::class, 'index'])->name('dashboard');
+
+Route::prefix('api')->group(function () {
+    Route::get('/vehicle-events', [CalendarController::class, 'events']);
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

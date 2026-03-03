@@ -56,37 +56,27 @@ class TripExportController extends Controller
             ->orderBy('start_at')
             ->get();
 
-        abort_if($trips->isEmpty(), 404);
+        // abort_if($trips->isEmpty(), 404);
 
         // Bulan Indonesia (FULL di controller)
         $monthName = Carbon::create($tahun, $bulan, 1)
             ->locale('id')
             ->translatedFormat('F'); // "Februari"
 
-        // Helper format tanggal: "11 Feb 2026 09:22"
-        $fmt = fn($val) => $val
-            ? Carbon::parse($val)->locale('id')->translatedFormat('d M Y H:i')
-            : '';
-
-        // Mapping + format tanggal "s/d" jadi STRING (FULL di controller)
+        // Mapping + format tanggal "s/d"
         $items = $trips->map(function ($t) {
-
             $start = $t->start_at ?? $t->created_at;
             $end   = $t->end_at ?? null;
 
             if (!$start) {
                 $tanggal = '-';
             } else {
-
                 $startDate = Carbon::parse($start)->locale('id');
                 $endDate   = $end ? Carbon::parse($end)->locale('id') : null;
 
                 if ($endDate && !$startDate->isSameDay($endDate)) {
                     // beda hari → 10 - 11 Februari 2026
-                    $tanggal =
-                        $startDate->translatedFormat('d') .
-                        ' - ' .
-                        $endDate->translatedFormat('d F Y');
+                    $tanggal = $startDate->translatedFormat('d') . ' - ' . $endDate->translatedFormat('d F Y');
                 } else {
                     // satu hari → 10 Februari 2026
                     $tanggal = $startDate->translatedFormat('d F Y');
@@ -102,20 +92,31 @@ class TripExportController extends Controller
             ];
         })->values()->all();
 
+        // --- LOGIKA CHUNKING & PADDING ---
+        $rowsPerPage = 20;
+        $totalItems = count($items);
+
+        // Cari kelipatan 20 terdekat ke atas (misal: 25 data -> butuh 40 baris / 2 halaman)
+        $targetTotalRows = ceil($totalItems / $rowsPerPage) * $rowsPerPage;
+        if ($targetTotalRows == 0) $targetTotalRows = $rowsPerPage; // Minimal 1 halaman walau kosong
+
+        // Pad array dengan null agar jumlahnya pas kelipatan 20
+        $itemsPadded = array_pad($items, $targetTotalRows, null);
+
+        // Pecah array menjadi beberapa kelompok, masing-masing 20 item
+        $chunks = array_chunk($itemsPadded, $rowsPerPage);
+        // ---------------------------------
+
         $pdf = Pdf::loadView('admin.trips.pdf.rekap-kendaraan-keluar', [
-            'items'      => $items,
-            'monthName'  => strtoupper($monthName), // jadi "FEBRUARI"
-            'year'       => $tahun,
-            'totalRows'  => 20,
-
-            // tanda tangan juga full dari controller
-
-            'signCity'   => 'Surabaya',
-            'signDay'    => '.....',
-            'signMonthName' => $monthName, // "Februari"
-            'signYear'   => $tahun,
-            'signName'   => 'Sunaryo',
-            'signNip'    => 'NIP.19730417200812001',
+            'chunks'        => $chunks,
+            'monthName'     => strtoupper($monthName),
+            'year'          => $tahun,
+            'signCity'      => 'Surabaya',
+            'signDay'       => '.....',
+            'signMonthName' => $monthName,
+            'signYear'      => $tahun,
+            'signName'      => 'Sunaryo',
+            'signNip'       => 'NIP.19730417200812001',
         ])->setPaper('A4', 'portrait');
 
         $fileMonth = str_pad((string)$bulan, 2, '0', STR_PAD_LEFT);

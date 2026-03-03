@@ -29,7 +29,7 @@ class DashboardAdminController extends Controller
     public function index(Request $request)
     {
         // ====== DATA DASHBOARD YANG SUDAH ADA ======
-        $cars = Car::all();
+        $cars = Car::where('status', 'available')->get();
         $drivers = Driver::where('status', 'active')->get();
 
         $now = Carbon::now();

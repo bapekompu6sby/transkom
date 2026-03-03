@@ -106,6 +106,7 @@
             width: 70mm;
             float: right;
             font-size: 12pt;
+            text-align: center;
         }
 
         .sign-space {
@@ -124,48 +125,59 @@
 
 <body>
 
-    <div class="header">
-        <div class="title">CEK LIST DATA KENDARAAN KELUAR</div>
-        <div class="subtitle">{{ $monthName }} {{ $year }}</div>
-    </div>
-
-    <table class="checklist">
-        <thead>
-            <tr>
-                <th class="col-no">NO</th>
-                <th class="col-requester">PENGAJU</th>
-                <th class="col-nama">DRIVER</th>
-                <th class="col-tujuan">TUJUAN</th>
-                <th class="col-nopol">NOPOL</th>
-                <th class="col-tgl">TANGGAL</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for ($i = 1; $i <= $totalRows; $i++)
-                @php $row = $items[$i - 1] ?? null; @endphp
-                <tr>
-                    <td class="col-no">{{ $i }}</td>
-                    <td class="col-requester">{{ $row['requester_name'] ?? '' }}</td>
-                    <td class="col-nama">{{ $row['nama'] ?? '' }}</td>
-                    <td class="col-tujuan">{{ $row['tujuan'] ?? '' }}</td>
-                    <td class="col-nopol">{{ $row['nopol'] ?? '' }}</td>
-                    <td class="col-tgl">
-                        {!! nl2br(e($row['tanggal'] ?? '')) !!}
-                    </td>
-                </tr>
-            @endfor
-        </tbody>
-    </table>
-
-    <div class="footer">
-        <div class="sign-block">
-            <div>{{ $signCity }}, {{ $signDay }} {{ $signMonthName }} {{ $signYear }}</div>
-            <div class="sign-space"></div>
-            <div class="sign-name">{{ $signName }}</div>
-            <div>{{ $signNip }}</div>
+    @foreach ($chunks as $pageIndex => $chunk)
+        <div class="header">
+            <div class="title">CEK LIST DATA KENDARAAN KELUAR</div>
+            <div class="subtitle">{{ $monthName }} {{ $year }}</div>
         </div>
-        <div class="clearfix"></div>
-    </div>
+
+        <table class="checklist">
+            <thead>
+                <tr>
+                    <th class="col-no">NO</th>
+                    <th class="col-requester">PENGAJU</th>
+                    <th class="col-nama">DRIVER</th>
+                    <th class="col-tujuan">TUJUAN</th>
+                    <th class="col-nopol">NOPOL</th>
+                    <th class="col-tgl">TANGGAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($chunk as $index => $row)
+                    @php
+                        // Kalkulasi nomor urut berlanjut
+                        $rowNumber = $pageIndex * 20 + $loop->iteration;
+                    @endphp
+                    <tr>
+                        <td class="col-no">{{ $rowNumber }}</td>
+                        <td class="col-requester">{{ $row['requester_name'] ?? '' }}</td>
+                        <td class="col-nama">{{ $row['nama'] ?? '' }}</td>
+                        <td class="col-tujuan">{{ $row['tujuan'] ?? '' }}</td>
+                        <td class="col-nopol">{{ $row['nopol'] ?? '' }}</td>
+                        <td class="col-tgl">
+                            {!! isset($row['tanggal']) ? nl2br(e($row['tanggal'])) : '' !!}
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        {{-- Tanda Tangan SEKARANG MUNCUL DI SETIAP HALAMAN --}}
+        <div class="footer">
+            <div class="sign-block">
+                <div>{{ $signCity }}, {{ $signDay }} {{ $signMonthName }} {{ $signYear }}</div>
+                <div class="sign-space"></div>
+                <div class="sign-name">{{ $signName }}</div>
+                <div>{{ $signNip }}</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+        {{-- Force page break (ganti halaman) HANYA JIKA BUKAN halaman terakhir --}}
+        @if (!$loop->last)
+            <div style="page-break-after: always;"></div>
+        @endif
+    @endforeach
 
 </body>
 

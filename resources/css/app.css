@@ -198,3 +198,12 @@ table.dt-table tbody tr:hover {
   opacity: .5 !important;
   cursor: not-allowed !important;
 }
+
+.fc .fc-header-toolbar {
+  display: none !important;
+}
+
+/* Hilangkan titik (dot) di month view */
+.fc-daygrid-event-dot {
+  display: none !important;
+}

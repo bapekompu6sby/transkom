@@ -108,6 +108,14 @@
             : $start->translatedFormat('d F Y') . ' s/d ' . $end->translatedFormat('d F Y');
 
         $jam = $start->format('H:i') . ' – ' . $end->format('H:i');
+
+        $nomor =
+            $trip->created_at->format('d m') .
+            ' - ' .
+            $trip->created_at->format('Y') .
+            '.' .
+            str_pad($trip->id, 2, '0', STR_PAD_LEFT);
+
     @endphp
 
     <div class="header">
@@ -115,7 +123,7 @@
         <p>Angkutan Kendaraan Dinas</p>
 
         <div class="nomor">
-            Nomor: UM 02 04 –1869.{{ str_pad($trip->id, 2, '0', STR_PAD_LEFT) }}
+            Nomor: <span class="bold">{{ $nomor }}</span>
         </div>
     </div>
 
