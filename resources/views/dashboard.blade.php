@@ -170,7 +170,7 @@
                 {{-- Tombol Lihat Buku (target="_blank" agar buka tab baru, tidak auto download) --}}
                 {{-- Sesuaikan 'buku-panduan.pdf' dengan nama file asli di dalam folder public kamu --}}
                 {{-- {{ asset('buku-panduan.pdf') }} --}}
-                <a href="#" target="_blank"
+                <a href="{{ asset('/storage/assets/buku_panduan_transkom.pdf') }}" target="_blank"
                     class="shrink-0 px-6 py-3 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-md flex items-center gap-2">
                     Lihat Buku Panduan
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +191,7 @@
                         <h3 class="text-xl font-bold tracking-wider text-white">TRANSKOM</h3>
                         <p class="text-sm text-gray-400 mt-2 max-w-sm">
                             Sistem Peminjaman Kendaraan <br>
-                            Balai Pengembangan Kompetensi PUPR Wilayah VI Surabaya
+                            Balai Pengembangan Kompetensi PU Wilayah VI Surabaya
                         </p>
                     </div>
 
